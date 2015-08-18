@@ -13,22 +13,22 @@
         "media": [
             {
                 "file": "fonts/EuropeUnderground_light.ttf",
-                "name": "LIGHT_15",
+                "name": "LIGHT_10",
                 "type": "font"
             },
             {
                 "file": "fonts/EuropeUnderground_light.ttf",
-                "name": "LIGHT_20",
+                "name": "LIGHT_23",
                 "type": "font"
             },
             {
                 "file": "fonts/EuropeUnderground_black.ttf",
-                "name": "DARK_20",
+                "name": "DARK_17",
                 "type": "font"
             },
             {
                 "file": "fonts/EuropeUnderground_black.ttf",
-                "name": "DARK_30",
+                "name": "DARK_40",
                 "type": "font"
             }
         ]
