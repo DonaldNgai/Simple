@@ -1,10 +1,10 @@
 #include <pebble.h>
 static Window *s_main_window;
 static TextLayer *hour_layer;
-static TextLayer *minute_layer;
-static TextLayer *second_layer;
+// static TextLayer *minute_layer;
+// static TextLayer *second_layer;
 static GFont s_hour_font;
-static GFont s_text_font;
+// static GFont s_text_font;
 static TextLayer *s_weather_layer;
 
 enum {
@@ -15,7 +15,7 @@ enum {
 static void main_window_load(Window *window) {
   
   s_hour_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_30));
-  s_text_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_20));
+//   s_text_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_20));
   
   //Hour Layer
   hour_layer = text_layer_create(GRect(0, 55, 144, 50));
@@ -50,18 +50,18 @@ static void main_window_load(Window *window) {
   text_layer_set_text_color(s_weather_layer, GColorBlack);
   text_layer_set_text_alignment(s_weather_layer, GTextAlignmentCenter);
   text_layer_set_text(s_weather_layer, "Loading...");
-  text_layer_set_font(s_weather_layer, s_text_font);
+  text_layer_set_font(s_weather_layer, s_hour_font);
   layer_add_child(window_get_root_layer(s_main_window), text_layer_get_layer(s_weather_layer));
 }
 
 static void main_window_unload(Window *window) {
   
   fonts_unload_custom_font(s_hour_font);
-  fonts_unload_custom_font(s_text_font);
+//   fonts_unload_custom_font(s_text_font);
   text_layer_destroy(s_weather_layer);
   text_layer_destroy(hour_layer);
-  text_layer_destroy(minute_layer);
-  text_layer_destroy(second_layer);
+//   text_layer_destroy(minute_layer);
+//   text_layer_destroy(second_layer);
   
 }
 
@@ -70,25 +70,29 @@ static void update_time(){
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
   
-  static char hourBuffer[] = "00:00";
-  static char minuteBuffer[] = "00";
-  static char secondBuffer[] = "AM";
+//   static char hourBuffer[] = "00:00";
+//   static char minuteBuffer[] = "00";
+//   static char secondBuffer[] = "AM";
+    static char buffer[] = "AM";
   
    // Write the current hours and minutes into the buffer
   if(clock_is_24h_style() == true) {
     // Use 24 hour format
-    strftime(hourBuffer, sizeof("00:00"), "%H:%M", tick_time);
+    strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
   } else {
     // Use 12 hour format
-    strftime(hourBuffer, sizeof("00:00"), "%I", tick_time);
-    strftime(minuteBuffer, sizeof("00"), "%M", tick_time);
-    strftime(secondBuffer, sizeof("AM"), "%p", tick_time);
+//     strftime(hourBuffer, sizeof("00:00"), "%I", tick_time);
+//     strftime(minuteBuffer, sizeof("00"), "%M", tick_time);
+//     strftime(secondBuffer, sizeof("AM"), "%p", tick_time);
+        strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
 }
   
   // Display this time on the TextLayer
-  text_layer_set_text(hour_layer, hourBuffer);
-  text_layer_set_text(minute_layer, minuteBuffer);
-  text_layer_set_text(second_layer, secondBuffer);
+//   text_layer_set_text(hour_layer, hourBuffer);
+//   text_layer_set_text(minute_layer, minuteBuffer);
+//   text_layer_set_text(second_layer, secondBuffer);
+    text_layer_set_text(hour_layer, buffer);
+
   
 }
 
