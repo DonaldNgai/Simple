@@ -1,0 +1,37 @@
+{
+    "appKeys": {
+        "KEY_CONDITIONS": 1,
+        "KEY_TEMPERATURE": 0
+    },
+    "capabilities": [
+        "location"
+    ],
+    "companyName": "donaldtak@hotmail.com",
+    "longName": "Simple",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "fonts/EuropeUnderground_light.ttf",
+                "name": "LIGHT_20",
+                "type": "font"
+            },
+            {
+                "file": "fonts/EuropeUnderground_black.ttf",
+                "name": "DARK_30",
+                "type": "font"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "Simple",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
+    "uuid": "76803b25-7091-4365-bb50-be1177b50081",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
