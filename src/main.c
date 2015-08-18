@@ -4,6 +4,8 @@ static TextLayer *hour_layer;
 static TextLayer *minute_layer;
 static TextLayer *second_layer;
 static GFont s_hour_font;
+static GFont s_minute_font;
+static GFont s_second_font;
 static GFont s_text_font;
 static TextLayer *s_weather_layer;
 
@@ -15,7 +17,9 @@ enum {
 static void main_window_load(Window *window) {
   
   s_hour_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_30));
-  s_text_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_20));
+  s_minute_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_20));
+  s_second_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_20));
+  s_text_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_15));
   
   //Hour Layer
   hour_layer = text_layer_create(GRect(0, 55, 144, 50));
@@ -27,25 +31,25 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(hour_layer));
   
 //   //Minute Layer
-  minute_layer = text_layer_create(GRect(30, 30, 144, 50));
+  minute_layer = text_layer_create(GRect(20, 55, 144, 50));
   text_layer_set_background_color(minute_layer, GColorClear);
   text_layer_set_text_color(minute_layer, GColorBlack);
   // Improve the layout to be more like a watchface
-  text_layer_set_font(minute_layer, s_text_font);
+  text_layer_set_font(minute_layer, s_minute_font);
   text_layer_set_text_alignment(minute_layer, GTextAlignmentCenter);
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(minute_layer));
   
   //Second Layer
-  second_layer = text_layer_create(GRect(30, 55, 144, 50));
+  second_layer = text_layer_create(GRect(20, 65, 144, 50));
   text_layer_set_background_color(second_layer, GColorClear);
   text_layer_set_text_color(second_layer, GColorBlack);
   // Improve the layout to be more like a watchface
-  text_layer_set_font(second_layer, s_hour_font);
+  text_layer_set_font(second_layer, s_second_font);
   text_layer_set_text_alignment(second_layer, GTextAlignmentCenter);
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(second_layer));
   
   //Weather Layer
-  s_weather_layer = text_layer_create(GRect(0, 130, 144, 50));
+  s_weather_layer = text_layer_create(GRect(0, 85, 144, 50));
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorBlack);
   text_layer_set_text_alignment(s_weather_layer, GTextAlignmentCenter);
@@ -70,28 +74,30 @@ static void update_time(){
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
   
-//   static char hourBuffer[] = "00:00";
-//   static char minuteBuffer[] = "00";
-//   static char secondBuffer[] = "AM";
-    static char buffer[] = "AM";
+  static char hourBuffer[] = "00";
+  static char minuteBuffer[] = "00";
+  static char secondBuffer[] = "...";
+//     static char buffer[] = "AM";
   
    // Write the current hours and minutes into the buffer
   if(clock_is_24h_style() == true) {
     // Use 24 hour format
-    strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
+    strftime(hourBuffer, sizeof("00"), "%H", tick_time);
+    strftime(minuteBuffer, sizeof("00"), "%M", tick_time);
+    strftime(secondBuffer, sizeof("29C"), "%p", tick_time);
   } else {
     // Use 12 hour format
-//     strftime(hourBuffer, sizeof("00:00"), "%I", tick_time);
-//     strftime(minuteBuffer, sizeof("00"), "%M", tick_time);
-//     strftime(secondBuffer, sizeof("AM"), "%p", tick_time);
-        strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
+    strftime(hourBuffer, sizeof("00"), "%I", tick_time);
+    strftime(minuteBuffer, sizeof("00"), "%M", tick_time);
+    strftime(secondBuffer, sizeof("AM"), "%p", tick_time);
+//         strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
 }
   
   // Display this time on the TextLayer
-//   text_layer_set_text(hour_layer, hourBuffer);
-//   text_layer_set_text(minute_layer, minuteBuffer);
-//   text_layer_set_text(second_layer, secondBuffer);
-    text_layer_set_text(hour_layer, buffer);
+  text_layer_set_text(hour_layer, hourBuffer);
+  text_layer_set_text(minute_layer, minuteBuffer);
+  text_layer_set_text(second_layer, secondBuffer);
+//     text_layer_set_text(hour_layer, buffer);
 
   
 }
@@ -148,7 +154,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   }
   
   // Assemble full string and display
-  snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s, %s", temperature_buffer, conditions_buffer);
+  snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s", temperature_buffer);
   text_layer_set_text(s_weather_layer, weather_layer_buffer);
 }
 
