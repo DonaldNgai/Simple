@@ -19,7 +19,7 @@ static void main_window_load(Window *window) {
   s_hour_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_40));
   s_minute_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_23));
   s_second_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_17));
-  s_text_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_10));
+  s_text_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_12));
   
   //Hour Layer
   hour_layer = text_layer_create(GRect(30, 55, 144, 50));
@@ -46,7 +46,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(second_layer));
   
   //Weather Layer
-  s_weather_layer = text_layer_create(GRect(100, 60, 144, 50));
+  s_weather_layer = text_layer_create(GRect(99, 58, 144, 50));
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorBlack);
   text_layer_set_text(s_weather_layer, "Loading...");
@@ -151,14 +151,17 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   
   // Assemble full string and display
 //     strftime(dateBuffer, sizeof("JUN\n12\n"), "%b\n%d\n", tick_time);
-  strftime(monthBuffer, sizeof("SUN"), "%^b", tick_time);
+  strftime(monthBuffer, sizeof("SUN1225C"), "%^b", tick_time);
   strftime(dateBuffer, sizeof("SUN"), "%d", tick_time);
   snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s", temperature_buffer);
-  strcat(monthBuffer, "\n");
-strcat(monthBuffer, dateBuffer);
-  strcat(monthBuffer, "\n");
-    strcat(monthBuffer,weather_layer_buffer);
-    text_layer_set_text(s_weather_layer, monthBuffer);
+//   strcat(monthBuffer, "");
+  strcat(monthBuffer, dateBuffer);
+//   strcat(monthBuffer, "");
+//     strcat(monthBuffer,weather_layer_buffer);
+  strcat(weather_layer_buffer,"\n");
+      strcat(weather_layer_buffer,monthBuffer);
+
+    text_layer_set_text(s_weather_layer, weather_layer_buffer);
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
