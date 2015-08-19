@@ -1,4 +1,5 @@
 #include <pebble.h>
+
 static Window *s_main_window;
 static TextLayer *hour_layer;
 static TextLayer *minute_layer;
@@ -16,21 +17,25 @@ enum {
 
 static void main_window_load(Window *window) {
   
+  int X = 28;
+  int HOUR_GAP = 38;
+  int MIDDLE_GAP = 32;
+  
   s_hour_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_40));
   s_minute_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_23));
   s_second_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_17));
   s_text_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_12));
   
   //Hour Layer
-  hour_layer = text_layer_create(GRect(30, 55, 144, 50));
+  hour_layer = text_layer_create(GRect(X, 58, 144, 50));
   text_layer_set_background_color(hour_layer, GColorClear);
   text_layer_set_text_color(hour_layer, GColorBlack);
   // Improve the layout to be more like a watchface
   text_layer_set_font(hour_layer, s_hour_font);
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(hour_layer));
   
-//   //Minute Layer
-  minute_layer = text_layer_create(GRect(67, 55, 144, 50));
+  //Minute Layer
+  minute_layer = text_layer_create(GRect(X + HOUR_GAP, 58, 144, 50));
   text_layer_set_background_color(minute_layer, GColorClear);
   text_layer_set_text_color(minute_layer, GColorBlack);
   // Improve the layout to be more like a watchface
@@ -38,7 +43,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(minute_layer));
   
   //Second Layer
-  second_layer = text_layer_create(GRect(67, 78, 144, 50));
+  second_layer = text_layer_create(GRect(X + HOUR_GAP, 81, 144, 50));
   text_layer_set_background_color(second_layer, GColorClear);
   text_layer_set_text_color(second_layer, GColorBlack);
   // Improve the layout to be more like a watchface
@@ -46,12 +51,13 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(second_layer));
   
   //Weather Layer
-  s_weather_layer = text_layer_create(GRect(99, 58, 144, 50));
+  s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + MIDDLE_GAP, 61, 144, 50));
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorBlack);
   text_layer_set_text(s_weather_layer, "Loading...");
   text_layer_set_font(s_weather_layer, s_text_font);
   layer_add_child(window_get_root_layer(s_main_window), text_layer_get_layer(s_weather_layer));
+  
 }
 
 static void main_window_unload(Window *window) {
@@ -77,7 +83,7 @@ static void update_time(){
    // Write the current hours and minutes into the buffer
   if(clock_is_24h_style() == true) {
     // Use 24 hour format
-    strftime(hourBuffer, sizeof("00"), "%H", tick_time);
+    strftime(hourBuffer, sizeof("00"), "%I", tick_time);
     strftime(minuteBuffer, sizeof("00"), "%M", tick_time);
     strftime(secondBuffer, sizeof("SUN"), "%a", tick_time);
   } else {
@@ -202,6 +208,7 @@ static void init() {
   window_stack_push(s_main_window, true);
   
   update_time();
+  
 }
 
 static void deinit() {
