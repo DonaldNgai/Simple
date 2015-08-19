@@ -51,13 +51,18 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(second_layer));
   
   //Weather Layer
-  s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + MIDDLE_GAP, 61, 144, 50));
+  if(clock_is_24h_style() == true) {
+      s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + MIDDLE_GAP, 61, 144, 50));
+  }
+  else{
+    s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + 26, 61, 144, 50));
+  }
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorBlack);
   text_layer_set_text(s_weather_layer, "Loading...");
   text_layer_set_font(s_weather_layer, s_text_font);
   layer_add_child(window_get_root_layer(s_main_window), text_layer_get_layer(s_weather_layer));
-  
+
 }
 
 static void main_window_unload(Window *window) {
