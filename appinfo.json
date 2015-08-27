@@ -12,6 +12,21 @@
     "resources": {
         "media": [
             {
+                "file": "fonts/absender1.ttf",
+                "name": "ABSENDER_40",
+                "type": "font"
+            },
+            {
+                "file": "fonts/monoMMM_5.ttf",
+                "name": "MONOMM_20",
+                "type": "font"
+            },
+            {
+                "file": "fonts/monofonto.ttf",
+                "name": "MONO_20",
+                "type": "font"
+            },
+            {
                 "file": "fonts/NORMT___.TTF",
                 "name": "NORM_25",
                 "type": "font"

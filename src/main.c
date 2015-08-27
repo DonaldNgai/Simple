@@ -1,34 +1,48 @@
 #include <pebble.h>
 
+  struct positionInfo {
+  int X;
+  int HOUR_GAP;
+  int MIDDLE_GAP;
+  int MINUTE_GAP;
+};
+
+static struct positionInfo posInfo;
+  
 static Window *s_main_window;
 static TextLayer *hour_layer;
 static TextLayer *minute_layer;
+static GRect minuteFrame = {.origin = {.x = 28 + 38, .y = 58}, .size = {.w = 144, .h = 50}};
 static TextLayer *second_layer;
+static GRect secondFrame = {.origin = {.x = 28 + 38, .y = 78}, .size = {.w = 144, .h = 50}};
 static GFont s_hour_font;
 static GFont s_minute_font;
 static GFont s_second_font;
 static GFont s_text_font;
 static TextLayer *s_weather_layer;
+static GRect weatherFrame;
 
 enum {
   KEY_TEMPERATURE = 0,
   KEY_CONDITIONS = 1
 };
 
+
+
 static void main_window_load(Window *window) {
   
-  int X = 28;
-  int HOUR_GAP = 38;
-  int DAY_GAP = 34;
-  int MINUTE_GAP = 26;
-  
   s_hour_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_40));
-  s_minute_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_23));
-  s_second_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_17));
+  s_minute_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_MONOMM_20));
+  s_second_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_MONOMM_20));
   s_text_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_12));
   
+  posInfo.X = 28;
+  posInfo.HOUR_GAP = 38;
+  posInfo.MIDDLE_GAP = 40;
+  posInfo.MINUTE_GAP = 26;
+  
   //Hour Layer
-  hour_layer = text_layer_create(GRect(X, 58, 144, 50));
+  hour_layer = text_layer_create(GRect(posInfo.X, 58, 144, 50));
   text_layer_set_background_color(hour_layer, GColorClear);
   text_layer_set_text_color(hour_layer, GColorBlack);
   // Improve the layout to be more like a watchface
@@ -36,7 +50,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(hour_layer));
   
   //Minute Layer
-  minute_layer = text_layer_create(GRect(X + HOUR_GAP, 58, 144, 50));
+  minute_layer = text_layer_create(minuteFrame);
   text_layer_set_background_color(minute_layer, GColorClear);
   text_layer_set_text_color(minute_layer, GColorBlack);
   // Improve the layout to be more like a watchface
@@ -44,7 +58,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(s_main_window),text_layer_get_layer(minute_layer));
   
   //Second Layer
-  second_layer = text_layer_create(GRect(X + HOUR_GAP, 81, 144, 50));
+  second_layer = text_layer_create(secondFrame);
   text_layer_set_background_color(second_layer, GColorClear);
   text_layer_set_text_color(second_layer, GColorBlack);
   // Improve the layout to be more like a watchface
@@ -53,16 +67,51 @@ static void main_window_load(Window *window) {
   
   //Weather Layer
   if(clock_is_24h_style() == true) {
-      s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + DAY_GAP, 61, 144, 50));
+      weatherFrame.origin.x = posInfo.X + posInfo.HOUR_GAP + posInfo.MIDDLE_GAP;
+      weatherFrame.origin.y = 61;
+      s_weather_layer = text_layer_create(GRect(posInfo.X + posInfo.HOUR_GAP + posInfo.MIDDLE_GAP, 61, 144, 50));
   }
   else{
-    s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + MINUTE_GAP, 61, 144, 50));
+     weatherFrame.origin.x = posInfo.X + posInfo.HOUR_GAP + posInfo.MINUTE_GAP;
+      weatherFrame.origin.y = 61;
+      s_weather_layer = text_layer_create(weatherFrame);
   }
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorBlack);
   text_layer_set_text(s_weather_layer, "Loading...");
   text_layer_set_font(s_weather_layer, s_text_font);
   layer_add_child(window_get_root_layer(s_main_window), text_layer_get_layer(s_weather_layer));
+
+}
+
+static void update_positions(){
+  Layer *minuteLayer_layer = text_layer_get_layer(minute_layer);
+  Layer *secondLayer_layer = text_layer_get_layer(second_layer);
+  Layer *weatherLayer_layer = text_layer_get_layer(s_weather_layer);
+  GSize hourSize = text_layer_get_content_size(hour_layer);
+  GSize minuteSize = text_layer_get_content_size(minute_layer);
+  GSize secondSize= text_layer_get_content_size(second_layer);
+  
+  posInfo.HOUR_GAP = hourSize.w + 1;
+  printf("hour : %d : %d", hourSize.h, hourSize.w);
+  printf("minute: %d : %d", minuteSize.h, minuteSize.w);
+  printf("secondSize: %d : %d", secondSize.h, secondSize.w);
+  if(minuteSize.w > secondSize.w) {
+    posInfo.MIDDLE_GAP = minuteSize.w + 1;
+  }
+  else{
+    posInfo.MIDDLE_GAP = secondSize.w + 1;
+  }
+  
+  secondFrame.origin.x = minuteFrame.origin.x = posInfo.X + posInfo.HOUR_GAP;
+  weatherFrame.origin.x = posInfo.X + posInfo.HOUR_GAP + posInfo.MIDDLE_GAP;
+  
+  layer_set_frame(minuteLayer_layer, minuteFrame);
+  layer_set_frame(secondLayer_layer, secondFrame);
+  layer_set_frame(weatherLayer_layer, weatherFrame);
+  layer_mark_dirty(minuteLayer_layer);
+  layer_mark_dirty(secondLayer_layer);
+  layer_mark_dirty(weatherLayer_layer);
 
 }
 
@@ -109,6 +158,7 @@ static void update_time(){
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   
   update_time();
+  update_positions();
   
   // Get weather update every 30 minutes
   if(tick_time->tm_min % 30 == 0) {
@@ -200,7 +250,7 @@ static void init() {
   });
   
   // Register with TickTimerService
-  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
   
   //Prepare AppMessage
   app_message_register_inbox_received(inbox_received_callback);
