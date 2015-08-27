@@ -19,7 +19,8 @@ static void main_window_load(Window *window) {
   
   int X = 28;
   int HOUR_GAP = 38;
-  int MIDDLE_GAP = 32;
+  int DAY_GAP = 34;
+  int MINUTE_GAP = 26;
   
   s_hour_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DARK_40));
   s_minute_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_LIGHT_23));
@@ -52,10 +53,10 @@ static void main_window_load(Window *window) {
   
   //Weather Layer
   if(clock_is_24h_style() == true) {
-      s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + MIDDLE_GAP, 61, 144, 50));
+      s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + DAY_GAP, 61, 144, 50));
   }
   else{
-    s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + 26, 61, 144, 50));
+    s_weather_layer = text_layer_create(GRect(X + HOUR_GAP + MINUTE_GAP, 61, 144, 50));
   }
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorBlack);

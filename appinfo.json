@@ -12,6 +12,16 @@
     "resources": {
         "media": [
             {
+                "file": "fonts/NORMT___.TTF",
+                "name": "NORM_25",
+                "type": "font"
+            },
+            {
+                "file": "fonts/FUTRFW.TTF",
+                "name": "FUTURE_25",
+                "type": "font"
+            },
+            {
                 "file": "fonts/EuropeUnderground_light.ttf",
                 "name": "LIGHT_23",
                 "type": "font"
