@@ -21,8 +21,8 @@ static GFont s_minute_font;
 static GFont s_second_font;
 static GFont s_text_font;
 static TextLayer *s_weather_layer;
-static GRect weatherFrame = {.origin = {.x = 0, .y = 58}, .size = {.w = 40, .h = 50}};
-static char weatherLongBuf[25];
+static GRect weatherFrame = {.origin = {.x = 0, .y = 60}, .size = {.w = 40, .h = 50}};
+static char weatherLongBuf[10];
 
 enum {
   KEY_TEMPERATURE = 0,
@@ -119,7 +119,8 @@ static void update_positions(){
   printf("window size: %d sub: %d add: %d", bounds.size.h, (bounds.size.h/2) - (hourSize.h/2), (bounds.size.h/2) + (hourSize.h/2));
   posInfo.X = (bounds.size.w - (posInfo.HOUR_GAP + posInfo.MIDDLE_GAP + weatherSize.w))/2;
   
-  hourFrame.origin.y = minuteFrame.origin.y = weatherFrame.origin.y = (bounds.size.h/2) - (hourSize.h/2);
+  hourFrame.origin.y = minuteFrame.origin.y = (bounds.size.h/2) - (hourSize.h/2);
+  weatherFrame.origin.y =hourFrame.origin.y + 3;
   secondFrame.origin.y = minuteFrame.origin.y + minuteSize.h + 1;
   
   hourFrame.origin.x = posInfo.X;
@@ -209,16 +210,17 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
+        printf("y's' beforesaved1 h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
 
   // Store incoming information
-  static char temperature_buffer[8];
-  static char conditions_buffer[32];
-  static char weather_layer_buffer[32];
-  static char dateBuffer[] = "12\n";
-  
+  char temperature_buffer[8];
+  char conditions_buffer[32];
+  char weather_layer_buffer[32];
+  char dateBuffer[] = "12\n";
+
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
-  
+
   // Read first item
   Tuple *t = dict_read_first(iterator);
 
@@ -241,25 +243,38 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     }
 
     // Look for next item
+
     t = dict_read_next(iterator);
   }
+          printf("y's' beforesaved1 h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
 
   // Assemble full string and display
     strftime(dateBuffer, sizeof("JUN1225C1111"), "%b\n%d\n", tick_time);
+          printf("y's' middlesaved1 h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
 
   snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s", temperature_buffer);
-  printf("weatherlayer before %s", text_layer_get_text(s_weather_layer));
-      printf("dateBuffer before %s", dateBuffer);
-      
+//   printf("weatherlayer before %s", text_layer_get_text(s_weather_layer));
+//       printf("dateBuffer before %s", dateBuffer);
+                    printf("y's' aftersaved1 h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
+
       strcat(dateBuffer,weather_layer_buffer);
-  printf("dateBuffer after %s", dateBuffer);
+//   printf("dateBuffer after %s", dateBuffer);
+              printf("y's' aftersaved2 h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
 
   strcpy( weatherLongBuf, dateBuffer );
+                printf("y's' aftersaved3 h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
+
   text_layer_set_text(s_weather_layer, weatherLongBuf);
-  printf("saved: %s",weatherLongBuf);
+//   printf("saved: %s",weatherLongBuf);
   
-  update_positions();
-}
+        printf("y's' beforesaved h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
+//   update_positions();
+          printf("y's' middlesaved h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
+
+  update_time();
+          printf("y's' aftersaved h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
+
+  }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!");
