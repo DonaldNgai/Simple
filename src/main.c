@@ -21,15 +21,7 @@ static GFont s_second_font;
 static GFont s_text_font;
 static TextLayer *s_weather_layer;
 static GRect weatherFrame = {.origin = {.x = 0, .y = 61}, .size = {.w = 40, .h = 50}};
-
-static char hourBuffer[] = "00";
-  static char minuteBuffer[] = "00";
-  static char secondBuffer[] = "AM";
-
-static char temperature_buffer[8];
-  static char conditions_buffer[32];
-  static char weather_layer_buffer[32];
-  static char dateBuffer[] = "12\n";
+static char weatherLongBuf[25];
 
 enum {
   KEY_TEMPERATURE = 0,
@@ -98,6 +90,9 @@ static void main_window_load(Window *window) {
 }
 
 static void update_positions(){
+    printf("update position");
+
+  
   Layer *minuteLayer_layer = text_layer_get_layer(minute_layer);
   Layer *secondLayer_layer = text_layer_get_layer(second_layer);
   Layer *weatherLayer_layer = text_layer_get_layer(s_weather_layer);
@@ -106,9 +101,9 @@ static void update_positions(){
   GSize secondSize= text_layer_get_content_size(second_layer);
   
   posInfo.HOUR_GAP = hourSize.w + 2;
-  printf("hour : %d : %d", hourSize.h, hourSize.w);
-  printf("minute: %d : %d", minuteSize.h, minuteSize.w);
-  printf("secondSize: %d : %d", secondSize.h, secondSize.w);
+//   printf("hour : %d : %d", hourSize.h, hourSize.w);
+//   printf("minute: %d : %d", minuteSize.h, minuteSize.w);
+//   printf("secondSize: %d : %d", secondSize.h, secondSize.w);
   if(minuteSize.w > secondSize.w) {
     posInfo.MIDDLE_GAP = minuteSize.w + 1;
   }
@@ -140,11 +135,14 @@ static void main_window_unload(Window *window) {
 }
 
 static void update_time(){
-  
+    printf("update time");
+
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
   
-  
+  static char hourBuffer[] = "00";
+  static char minuteBuffer[] = "00";
+  static char secondBuffer[] = "AM";
   
    // Write the current hours and minutes into the buffer
   if(clock_is_24h_style() == true) {
@@ -167,9 +165,13 @@ static void update_time(){
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+  printf("tick");
+  printf("buf bef: %s",weatherLongBuf);
+      printf("weatherlayer before %s", text_layer_get_text(s_weather_layer));
 
   update_positions();
-  
+    printf("weatherlayer middle %s", text_layer_get_text(s_weather_layer));
+
   // Get weather update every 30 minutes
   if(tick_time->tm_min % 30 == 0) {
     // Begin dictionary
@@ -183,13 +185,20 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
     app_message_outbox_send();
   }
   
-  //update_time();
-  
+  update_time();
+  text_layer_set_text(s_weather_layer, weatherLongBuf);
+  printf("weatherlayer after %s", text_layer_get_text(s_weather_layer));
+  printf("buf aft: %s",weatherLongBuf);
+
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
 
   // Store incoming information
+  static char temperature_buffer[8];
+  static char conditions_buffer[32];
+  static char weather_layer_buffer[32];
+  static char dateBuffer[] = "12\n";
   
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
@@ -223,16 +232,15 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     strftime(dateBuffer, sizeof("JUN1225C1111"), "%b\n%d\n", tick_time);
 
   snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s", temperature_buffer);
-  printf("weatherlayer before %s", text_layer_get_text(s_weather_layer));
-      printf("dateBuffer before %s", dateBuffer);
+//   printf("weatherlayer before %s", text_layer_get_text(s_weather_layer));
+//       printf("dateBuffer before %s", dateBuffer);
       
       strcat(dateBuffer,weather_layer_buffer);
-  printf("dateBuffer after %s", dateBuffer);
+//   printf("dateBuffer after %s", dateBuffer);
 
   text_layer_set_text(s_weather_layer, dateBuffer);
-  
-  printf("weatherlayer after %s", text_layer_get_text(s_weather_layer));
-  
+  strcpy( weatherLongBuf, dateBuffer );
+  printf("saved: %s",weatherLongBuf);
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
@@ -259,7 +267,7 @@ static void init() {
   });
   
   // Register with TickTimerService
-  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
   
   //Prepare AppMessage
   app_message_register_inbox_received(inbox_received_callback);
