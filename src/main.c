@@ -11,8 +11,9 @@ static struct positionInfo posInfo;
   
 static Window *s_main_window;
 static TextLayer *hour_layer;
+static GRect hourFrame = {.origin = {.x = 15, .y = 58}, .size = {.w = 140, .h = 50}};
 static TextLayer *minute_layer;
-static GRect minuteFrame = {.origin = {.x = 28 + 38, .y = 59}, .size = {.w = 40, .h = 22}};
+static GRect minuteFrame = {.origin = {.x = 28 + 38, .y = 58}, .size = {.w = 40, .h = 22}};
 static TextLayer *second_layer;
 static GRect secondFrame = {.origin = {.x = 28 + 38, .y = 78}, .size = {.w = 40, .h = 22}};
 static GFont s_hour_font;
@@ -20,7 +21,7 @@ static GFont s_minute_font;
 static GFont s_second_font;
 static GFont s_text_font;
 static TextLayer *s_weather_layer;
-static GRect weatherFrame = {.origin = {.x = 0, .y = 61}, .size = {.w = 40, .h = 50}};
+static GRect weatherFrame = {.origin = {.x = 0, .y = 58}, .size = {.w = 40, .h = 50}};
 static char weatherLongBuf[25];
 
 enum {
@@ -45,7 +46,7 @@ static void main_window_load(Window *window) {
   window_set_background_color(s_main_window, GColorBlack);
 
   //Hour Layer
-  hour_layer = text_layer_create(GRect(posInfo.X, 58, 140, 50));
+  hour_layer = text_layer_create(hourFrame);
   text_layer_set_background_color(hour_layer, GColorClear);
   text_layer_set_text_color(hour_layer, GColorWhite);
   // Improve the layout to be more like a watchface
@@ -81,8 +82,8 @@ static void main_window_load(Window *window) {
       weatherFrame.origin.y = 61;
       s_weather_layer = text_layer_create(weatherFrame);
   }
-  text_layer_set_background_color(s_weather_layer, GColorWhite);
-  text_layer_set_text_color(s_weather_layer, GColorBlack);
+  text_layer_set_background_color(s_weather_layer, GColorBlack);
+  text_layer_set_text_color(s_weather_layer, GColorWhite);
   text_layer_set_text(s_weather_layer, "Loading...");
   text_layer_set_font(s_weather_layer, s_text_font);
   layer_add_child(window_get_root_layer(s_main_window), text_layer_get_layer(s_weather_layer));
@@ -91,16 +92,19 @@ static void main_window_load(Window *window) {
 
 static void update_positions(){
     printf("update position");
+      printf("y's' before h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
 
-  
+  Layer *window_layer = window_get_root_layer(s_main_window);
+  Layer *hourLayer_layer = text_layer_get_layer(hour_layer);
   Layer *minuteLayer_layer = text_layer_get_layer(minute_layer);
   Layer *secondLayer_layer = text_layer_get_layer(second_layer);
   Layer *weatherLayer_layer = text_layer_get_layer(s_weather_layer);
   GSize hourSize = text_layer_get_content_size(hour_layer);
   GSize minuteSize = text_layer_get_content_size(minute_layer);
   GSize secondSize= text_layer_get_content_size(second_layer);
+  GSize weatherSize= text_layer_get_content_size(s_weather_layer);
   
-  posInfo.HOUR_GAP = hourSize.w + 2;
+    posInfo.HOUR_GAP = hourSize.w + 2;
 //   printf("hour : %d : %d", hourSize.h, hourSize.w);
 //   printf("minute: %d : %d", minuteSize.h, minuteSize.w);
 //   printf("secondSize: %d : %d", secondSize.h, secondSize.w);
@@ -111,15 +115,27 @@ static void update_positions(){
     posInfo.MIDDLE_GAP = secondSize.w + 1;
   }
   
+  GRect bounds = layer_get_bounds(window_layer);
+  printf("window size: %d sub: %d add: %d", bounds.size.h, (bounds.size.h/2) - (hourSize.h/2), (bounds.size.h/2) + (hourSize.h/2));
+  posInfo.X = (bounds.size.w - (posInfo.HOUR_GAP + posInfo.MIDDLE_GAP + weatherSize.w))/2;
+  
+  hourFrame.origin.y = minuteFrame.origin.y = weatherFrame.origin.y = (bounds.size.h/2) - (hourSize.h/2);
+  secondFrame.origin.y = minuteFrame.origin.y + minuteSize.h + 1;
+  
+  hourFrame.origin.x = posInfo.X;
   secondFrame.origin.x = minuteFrame.origin.x = posInfo.X + posInfo.HOUR_GAP;
   weatherFrame.origin.x = posInfo.X + posInfo.HOUR_GAP + posInfo.MIDDLE_GAP;
-  
+        printf("y's' middle h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
+
+  layer_set_frame(hourLayer_layer, hourFrame);
   layer_set_frame(minuteLayer_layer, minuteFrame);
   layer_set_frame(secondLayer_layer, secondFrame);
   layer_set_frame(weatherLayer_layer, weatherFrame);
+  layer_mark_dirty(hourLayer_layer);
   layer_mark_dirty(minuteLayer_layer);
   layer_mark_dirty(secondLayer_layer);
   layer_mark_dirty(weatherLayer_layer);
+      printf("y's' after h:%d m:%d s:%d w:%d", hourFrame.origin.y, minuteFrame.origin.y, secondFrame.origin.y, weatherFrame.origin.y);
 
 }
 
@@ -135,7 +151,7 @@ static void main_window_unload(Window *window) {
 }
 
 static void update_time(){
-    printf("update time");
+//     printf("update time");
 
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
@@ -165,12 +181,12 @@ static void update_time(){
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  printf("tick");
-  printf("buf bef: %s",weatherLongBuf);
-      printf("weatherlayer before %s", text_layer_get_text(s_weather_layer));
+//   printf("tick");
+//   printf("buf bef: %s",weatherLongBuf);
+//       printf("weatherlayer before %s", text_layer_get_text(s_weather_layer));
 
   update_positions();
-    printf("weatherlayer middle %s", text_layer_get_text(s_weather_layer));
+//     printf("weatherlayer middle %s", text_layer_get_text(s_weather_layer));
 
   // Get weather update every 30 minutes
   if(tick_time->tm_min % 30 == 0) {
@@ -187,8 +203,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   
   update_time();
   text_layer_set_text(s_weather_layer, weatherLongBuf);
-  printf("weatherlayer after %s", text_layer_get_text(s_weather_layer));
-  printf("buf aft: %s",weatherLongBuf);
+//   printf("weatherlayer after %s", text_layer_get_text(s_weather_layer));
+//   printf("buf aft: %s",weatherLongBuf);
 
 }
 
@@ -232,15 +248,17 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     strftime(dateBuffer, sizeof("JUN1225C1111"), "%b\n%d\n", tick_time);
 
   snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s", temperature_buffer);
-//   printf("weatherlayer before %s", text_layer_get_text(s_weather_layer));
-//       printf("dateBuffer before %s", dateBuffer);
+  printf("weatherlayer before %s", text_layer_get_text(s_weather_layer));
+      printf("dateBuffer before %s", dateBuffer);
       
       strcat(dateBuffer,weather_layer_buffer);
-//   printf("dateBuffer after %s", dateBuffer);
+  printf("dateBuffer after %s", dateBuffer);
 
-  text_layer_set_text(s_weather_layer, dateBuffer);
   strcpy( weatherLongBuf, dateBuffer );
+  text_layer_set_text(s_weather_layer, weatherLongBuf);
   printf("saved: %s",weatherLongBuf);
+  
+  update_positions();
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
