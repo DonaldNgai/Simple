@@ -7,33 +7,13 @@
         "location"
     ],
     "companyName": "donaldtak@hotmail.com",
-    "longName": "Simple",
+    "longName": "Sometimes",
     "projectType": "native",
     "resources": {
         "media": [
             {
-                "file": "fonts/absender1.ttf",
-                "name": "ABSENDER_40",
-                "type": "font"
-            },
-            {
                 "file": "fonts/monoMMM_5.ttf",
                 "name": "MONOMM_20",
-                "type": "font"
-            },
-            {
-                "file": "fonts/monofonto.ttf",
-                "name": "MONO_20",
-                "type": "font"
-            },
-            {
-                "file": "fonts/NORMT___.TTF",
-                "name": "NORM_25",
-                "type": "font"
-            },
-            {
-                "file": "fonts/FUTRFW.TTF",
-                "name": "FUTURE_25",
                 "type": "font"
             },
             {
@@ -59,7 +39,7 @@
         ]
     },
     "sdkVersion": "3",
-    "shortName": "Simple",
+    "shortName": "Sometimes",
     "targetPlatforms": [
         "aplite",
         "basalt"
@@ -67,6 +47,6 @@
     "uuid": "76803b25-7091-4365-bb50-be1177b50081",
     "versionLabel": "1.0",
     "watchapp": {
-        "watchface": false
+        "watchface": true
     }
 }
