@@ -247,6 +247,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   
   update_time();
 
+  update_positions();
   }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
