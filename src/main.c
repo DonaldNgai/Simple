@@ -158,7 +158,7 @@ static void update_time(){
    // Write the current hours and minutes into the buffer
   if(clock_is_24h_style() == true) {
     // Use 24 hour format
-    strftime(hourBuffer, sizeof("00"), "%I", tick_time);
+    strftime(hourBuffer, sizeof("00"), "%H", tick_time);
     strftime(minuteBuffer, sizeof("00"), "%M", tick_time);
     strftime(secondBuffer, sizeof("SUN"), "%a", tick_time);
   } else {
